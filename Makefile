@@ -6,11 +6,11 @@ venv:
 
 pylint:
 	. ./venv/bin/activate ;\
-	pylint --rcfile .pylintrc target_postgres/
+	pylint --rcfile .pylintrc target_greenplum/
 
 unit_test:
 	. ./venv/bin/activate ;\
-	pytest --cov=target_postgres  --cov-fail-under=44 tests/unit -v
+	pytest --cov=target_greenplum  --cov-fail-under=44 tests/unit -v
 
 env:
   	export TARGET_POSTGRES_PORT=5432
@@ -22,4 +22,4 @@ env:
 
 integration_test: env
 	. ./venv/bin/activate ;\
-	pytest tests/integration --cov=target_postgres  --cov-fail-under=87 -v
+	pytest tests/integration --cov=target_greenplum  --cov-fail-under=87 -v
