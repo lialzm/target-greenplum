@@ -372,7 +372,7 @@ class DbSync:
 
                 temp_table = self.table_name(stream_schema_message['stream'], is_temporary=True)
                 table_sql=self.create_table_query(table_name=temp_table, is_temporary=True)
-                get_logger.info(table_sql)
+                get_logger().info(table_sql)
                 cur.execute(table_sql)
 
                 copy_sql = "COPY {} ({}) FROM STDIN WITH (FORMAT CSV, ESCAPE '\\')".format(
