@@ -32,7 +32,7 @@ setup(name="target-greenplum",
       },
       entry_points="""
           [console_scripts]
-          target-postgres=target_greenplum:main
+          target-greenplum=target_greenplum:main
       """,
       packages=["target_greenplum"],
       package_data={},
