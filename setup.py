@@ -5,7 +5,7 @@ from setuptools import setup
 with open('README.md') as f:
     long_description = f.read()
 
-setup(name="pipelinewise-target-postgres",
+setup(name="target-greenplum",
       version="2.1.1",
       description="Singer.io target for loading data to PostgreSQL - PipelineWise compatible",
       long_description=long_description,

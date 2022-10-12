@@ -372,6 +372,7 @@ class DbSync:
 
                 temp_table = self.table_name(stream_schema_message['stream'], is_temporary=True)
                 table_sql=self.create_table_query(table_name=temp_table, is_temporary=True)
+                get_logger.info(table_sql)
                 cur.execute(table_sql)
 
                 copy_sql = "COPY {} ({}) FROM STDIN WITH (FORMAT CSV, ESCAPE '\\')".format(
@@ -448,17 +449,29 @@ class DbSync:
             for (name, schema) in self.flatten_schema.items()
         ]
 
-        primary_key = ["PRIMARY KEY ({})".format(', '.join(primary_column_names(stream_schema_message)))] \
-            if len(stream_schema_message['key_properties']) > 0 else []
 
         if not table_name:
             gen_table_name = self.table_name(stream_schema_message['stream'], is_temporary=is_temporary)
+        
+        table_type=stream_schema_message.get('table_type','heap')
+        if 'heap'==table_type:
+            primary_key = ["PRIMARY KEY ({})".format(', '.join(primary_column_names(stream_schema_message)))] \
+                if len(stream_schema_message['key_properties']) > 0 else []
+            return 'CREATE {}TABLE IF NOT EXISTS {} ({})'.format(
+                'TEMP ' if is_temporary else '',
+                table_name if table_name else gen_table_name,
+                ', '.join(columns + primary_key)
+            )
+        else:
+            primary_key = ["({})".format(', '.join(primary_column_names(stream_schema_message)))] \
+                if len(stream_schema_message['key_properties']) > 0 else []
+            return 'CREATE {}TABLE IF NOT EXISTS {} ({}) with (appendonly=true) distributed by ({});'.format(
+                'TEMP ' if is_temporary else '',
+                table_name if table_name else gen_table_name,
+                ', '.join(columns + primary_key),
+                ', '.join(primary_key)
+            )
 
-        return 'CREATE {}TABLE IF NOT EXISTS {} ({})'.format(
-            'TEMP ' if is_temporary else '',
-            table_name if table_name else gen_table_name,
-            ', '.join(columns + primary_key)
-        )
 
     def grant_usage_on_schema(self, schema_name, grantee):
         query = "GRANT USAGE ON SCHEMA {} TO GROUP {}".format(schema_name, grantee)
