@@ -449,11 +449,16 @@ class DbSync:
             for (name, schema) in self.flatten_schema.items()
         ]
 
+        table_type='heap'
 
         if not table_name:
             gen_table_name = self.table_name(stream_schema_message['stream'], is_temporary=is_temporary)
-        
-        table_type=stream_schema_message.get('table_type','heap')
+            ao_tables=self.connection_config.get('metadata',{}).get('ao_tables',[])
+            if gen_table_name in ao_tables:
+                table_type='ao'
+            else:
+                table_type='heap'
+
         if 'heap'==table_type:
             primary_key = ["PRIMARY KEY ({})".format(', '.join(primary_column_names(stream_schema_message)))] \
                 if len(stream_schema_message['key_properties']) > 0 else []
@@ -463,12 +468,12 @@ class DbSync:
                 ', '.join(columns + primary_key)
             )
         else:
-            primary_key = ["({})".format(', '.join(primary_column_names(stream_schema_message)))] \
+            primary_key = ["{}".format(', '.join(primary_column_names(stream_schema_message)))] \
                 if len(stream_schema_message['key_properties']) > 0 else []
-            return 'CREATE {}TABLE IF NOT EXISTS {} ({}) with (appendonly=true) distributed by ({});'.format(
+            return 'CREATE {} TABLE IF NOT EXISTS {} ({}) with (appendonly=true) distributed by ({});'.format(
                 'TEMP ' if is_temporary else '',
                 table_name if table_name else gen_table_name,
-                ', '.join(columns + primary_key),
+                ', '.join(columns ),
                 ', '.join(primary_key)
             )
 
