@@ -104,9 +104,6 @@ def persist_lines(config, lines) -> None:
             raise
         if 'type' not in o:
             raise Exception("Line is missing required key 'type': {}".format(line))
-        LOGGER.info("line====")
-        LOGGER.info(o)
-        LOGGER.info("line====")
         t = o['type']
 
         if t == 'RECORD':
