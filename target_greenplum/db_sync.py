@@ -453,16 +453,16 @@ class DbSync:
             for (name, schema) in self.flatten_schema.items()
         ]
 
-        table_type='heap'
+        table_type='ao'
 
         if not table_name:
             stream_name=stream_schema_message['stream']
             gen_table_name = self.table_name(stream_name, is_temporary=is_temporary)
             ao_tables=self.connection_config.get('metadata',{}).get('ao_tables',[])
-            if stream_name in ao_tables:
-                table_type='ao'
-            else:
-                table_type='heap'
+            # if stream_name in ao_tables:
+            #     table_type='ao'
+            # else:
+            #     table_type='heap'
 
         if 'heap'==table_type:
             primary_key = ["PRIMARY KEY ({})".format(', '.join(primary_column_names(stream_schema_message)))] \
