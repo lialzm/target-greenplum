@@ -456,9 +456,10 @@ class DbSync:
         table_type='heap'
 
         if not table_name:
-            gen_table_name = self.table_name(stream_schema_message['stream'], is_temporary=is_temporary)
+            stream_name=stream_schema_message['stream']
+            gen_table_name = self.table_name(stream_name, is_temporary=is_temporary)
             ao_tables=self.connection_config.get('metadata',{}).get('ao_tables',[])
-            if gen_table_name in ao_tables:
+            if stream_name in ao_tables:
                 table_type='ao'
             else:
                 table_type='heap'
